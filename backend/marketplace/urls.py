@@ -5,7 +5,8 @@ from .views import (
     ReferralListView, SupportTicketListCreateView, TicketReplyCreateView,
     AdminOverviewView, AdminUserListView, AdminUserBlockToggleView,
     AdminPendingDepositsView, AdminConfirmDepositView, NotificationListView,
-    AdminSupportTicketListView, AdminTicketReplyView, AdminOrdersListView, ProviderListView
+    AdminSupportTicketListView, AdminTicketReplyView, AdminOrdersListView, ProviderListView,
+    MarketreumCatalogSyncView,
 )
 
 urlpatterns = [
@@ -36,4 +37,7 @@ urlpatterns = [
     path('admin/orders/', AdminOrdersListView.as_view(), name='admin-orders-list'),
     path('admin/orders/<int:order_id>/approve/', AdminOrdersListView.as_view(), name='admin-order-approve'),
     path('admin/providers/', ProviderListView.as_view(), name='admin-providers'),
+
+    # Marketreum catalog integration
+    path('admin/marketreum/sync/', MarketreumCatalogSyncView.as_view(), name='marketreum-sync'),
 ]
