@@ -13,6 +13,11 @@ class Provider(models.Model):
         return f"{self.name} ({self.margin_percentage}% profit margin)"
 
 class Service(models.Model):
+    LISTING_TYPE_CHOICES = [
+        ('service', 'Service'),
+        ('product', 'Product'),
+    ]
+
     provider = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True, blank=True, related_name='services')
     provider_service_id = models.CharField(max_length=100, blank=True, null=True)
     provider_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -27,6 +32,13 @@ class Service(models.Model):
     badge = models.CharField(max_length=50, blank=True, null=True)
     stock_count = models.IntegerField(default=1000)
     is_active = models.BooleanField(default=True)
+
+    # External marketplace metadata. These fields keep the existing UI/order
+    # structure intact while allowing Marketreum products and services to be
+    # displayed alongside the current SMM catalog.
+    listing_type = models.CharField(max_length=20, choices=LISTING_TYPE_CHOICES, default='service', db_index=True)
+    external_url = models.URLField(max_length=500, blank=True, default='')
+    image_url = models.URLField(max_length=1000, blank=True, default='')
 
     def __str__(self):
         return f"{self.platform} - {self.name}"
@@ -68,7 +80,6 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     deliverable_info = models.TextField(blank=True, default="", help_text="Account credentials or download link delivered to buyer")
 
-    # Supplier API details
     provider_order_id = models.CharField(max_length=100, blank=True, null=True)
     start_count = models.IntegerField(default=0)
     remains = models.IntegerField(default=0)
@@ -154,7 +165,6 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for @{self.user.username}: {self.title}"
 
-
 class PaymentSetting(models.Model):
     bank_name = models.CharField(max_length=100, default="Moniepoint / GTBank")
     account_name = models.CharField(max_length=100, default="HopeSocial Ltd")
@@ -165,4 +175,3 @@ class PaymentSetting(models.Model):
 
     def __str__(self):
         return f"Payment Settings ({self.bank_name} - {self.account_number})"
-
