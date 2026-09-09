@@ -6,7 +6,6 @@ class PaymentSettingAdmin(admin.ModelAdmin):
     list_display = ['id', 'bank_name', 'account_name', 'account_number', 'flutterwave_public_key', 'updated_at']
 
 @admin.register(Provider)
-
 class ProviderAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'api_url', 'margin_percentage', 'is_active', 'created_at']
     list_filter = ['is_active']
@@ -14,9 +13,9 @@ class ProviderAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'platform', 'name', 'rate_per_1k', 'provider', 'provider_service_id', 'is_active']
-    list_filter = ['platform', 'category', 'provider', 'is_active']
-    search_fields = ['name', 'platform']
+    list_display = ['id', 'listing_type', 'platform', 'category', 'name', 'rate_per_1k', 'provider', 'provider_service_id', 'is_active']
+    list_filter = ['listing_type', 'platform', 'category', 'provider', 'is_active']
+    search_fields = ['name', 'platform', 'category', 'provider_service_id']
 
 @admin.register(AccountItem)
 class AccountItemAdmin(admin.ModelAdmin):
