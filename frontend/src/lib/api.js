@@ -84,7 +84,6 @@ export async function googleLoginUser(googlePayload) {
   return data;
 }
 
-
 export async function getUserProfile() {
   return fetchApi("/users/me/");
 }
@@ -105,6 +104,13 @@ export async function getDashboardStats() {
 export async function getServices(params = {}) {
   const query = new URLSearchParams(params).toString();
   return fetchApi(`/services/${query ? `?${query}` : ""}`);
+}
+
+export async function syncMarketreumCatalog() {
+  return fetchApi("/admin/marketreum/sync/", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
 }
 
 export async function getAccounts(params = {}) {
@@ -299,5 +305,3 @@ export async function approveAdminOrder(orderId, status = "Completed") {
     body: JSON.stringify({ status }),
   });
 }
-
-
