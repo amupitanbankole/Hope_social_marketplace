@@ -62,6 +62,10 @@ class MarketreumClient:
     def get_services(self) -> list[dict[str, Any]]:
         return self._unwrap_services(self._post("services"))
 
+    def get_products(self) -> list[dict[str, Any]]:
+        """Compatibility hook: the documented API has no products action."""
+        return []
+
     @staticmethod
     def _first(item: dict[str, Any], *keys: str, default: Any = None) -> Any:
         for key in keys:
@@ -89,16 +93,16 @@ class MarketreumClient:
 
     @staticmethod
     def detect_platform(name: str, category: str) -> str:
-        """Map Marketerum category/service names to the marketplace buttons."""
-        haystack = f"{name} {category}".lower()
+        """Map Marketreum category/service names to the existing platform buttons."""
+        haystack = f" {name} {category} ".lower()
         aliases = (
-            (("instagram", "ig"), "Instagram"),
-            (("facebook", "fb"), "Facebook"),
-            (("tiktok", "tik tok", "tt"), "TikTok"),
+            (("instagram", " ig "), "Instagram"),
+            (("facebook", " fb "), "Facebook"),
+            (("tiktok", "tik tok", " tt "), "TikTok"),
             (("twitter", "twitter/x", " x "), "Twitter/X"),
             (("telegram",), "Telegram"),
             (("discord",), "Discord"),
-            (("youtube", "youtube", "yt"), "YouTube"),
+            (("youtube", " yt "), "YouTube"),
             (("linkedin", "linked in"), "LinkedIn"),
             (("pinterest",), "Pinterest"),
             (("snapchat",), "Snapchat"),
@@ -111,9 +115,20 @@ class MarketreumClient:
     def normalize(
         self,
         item: dict[str, Any],
-        margin_pct: Decimal,
+        listing_type_or_margin: str | Decimal,
+        margin_pct: Decimal | None = None,
     ) -> dict[str, Any]:
-        """Normalize one documented Marketreum service for the Service model."""
+        """Normalize a Marketreum service.
+
+        Supports both the new ``normalize(item, margin)`` signature and the
+        previous ``normalize(item, listing_type, margin)`` call used by the
+        existing admin endpoint.
+        """
+        if margin_pct is None:
+            margin = Decimal(str(listing_type_or_margin))
+        else:
+            margin = margin_pct
+
         external_id = self._first(
             item, "service", "service_id", "id", "code", default=""
         )
@@ -124,7 +139,7 @@ class MarketreumClient:
 
         provider_rate = self._decimal(self._first(item, "rate", "price", default="0"))
         selling_rate = (
-            provider_rate * (Decimal("1.00") + margin_pct / Decimal("100"))
+            provider_rate * (Decimal("1.00") + margin / Decimal("100"))
         ).quantize(Decimal("0.01"))
 
         min_order = int(self._first(item, "min", "minimum", default=1) or 1)
@@ -158,7 +173,7 @@ class MarketreumClient:
             "is_active": self._bool(self._first(item, "active", "enabled", default=True)),
             "refill": refill,
             "cancel": cancel,
-            "service_type": service_type[:100],
+            "service_type": service_type[:50],
         }
 
     def place_order(
