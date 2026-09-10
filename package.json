@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"yellow,cyan\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && python manage.py runserver 8000",
+    "dev:backend": "cd backend && ..\\.venv\\Scripts\\python.exe manage.py runserver 8000",
     "build": "cd frontend && npm run build"
   },
   "devDependencies": {
